@@ -1,0 +1,59 @@
+# ===== .NET Core & Visual Studio =====
+bin/
+obj/
+out/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+
+# Logs
+*.log
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# EF Core Migrations snapshots
+**/*Snapshot.cs
+
+# VS Code / Rider / etc
+.vscode/
+.idea/
+*.code-workspace
+*.vs/
+
+# Publish profiles
+*.PublishProfiles/
+publish/
+
+# === Angular (in house-builder folder) ===
+HouseBuilder.WebUI/house-builder/node_modules/
+HouseBuilder.WebUI/house-builder/dist/
+HouseBuilder.WebUI/house-builder/.angular/
+HouseBuilder.WebUI/house-builder/.angular/cache/
+HouseBuilder.WebUI/house-builder/.env*
+HouseBuilder.WebUI/house-builder/coverage/
+HouseBuilder.WebUI/house-builder/npm-debug.log*
+HouseBuilder.WebUI/house-builder/yarn-debug.log*
+HouseBuilder.WebUI/house-builder/pnpm-debug.log*
+
+# Compiled JS/TS/SCSS maps (optional, if built locally)
+HouseBuilder.WebUI/house-builder/**/*.js
+HouseBuilder.WebUI/house-builder/**/*.js.map
+HouseBuilder.WebUI/house-builder/**/*.css.map
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Temp files
+~$*
+*.tmp
+*.temp
