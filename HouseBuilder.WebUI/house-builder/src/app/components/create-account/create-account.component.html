@@ -1,0 +1,326 @@
+<!-- create-account.component.html -->
+<app-navbar></app-navbar>
+
+<div class="registration-container">
+    <div class="notification success" *ngIf="registrationSuccess">
+        <div class="notification-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+        </div>
+        <div class="notification-content">
+            <span>Registration Successful!</span>
+            <p>Your account has been created.</p>
+        </div>
+        <button class="notification-close" (click)="dismissMessage()">×</button>
+    </div>
+
+    <div class="notification error" *ngIf="registrationError">
+        <div class="notification-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+        </div>
+        <div class="notification-content">
+            <span>Registration Failed</span>
+            <p>{{ errorMessage }}</p>
+        </div>
+        <button class="notification-close" (click)="dismissMessage()">×</button>
+    </div>
+
+     <div class="registration-header">
+        <h1>Create Your Account</h1>
+        <p>Join us and start designing your dream home</p>
+    </div>
+
+
+    <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="registration-form">
+        <div class="form-columns">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input 
+                        id="firstName" 
+                        formControlName="firstName" 
+                        type="text" 
+                        placeholder="Enter your first name">
+                    <div *ngIf="(registerForm.get('firstName')?.touched || submitted) && registerForm.get('firstName')?.hasError('required')" class="error-message">
+                        First Name is required.
+                    </div>
+                </div>
+            </div>
+                
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-field">
+                        <input 
+                            id="password" 
+                            formControlName="password" 
+                            [type]="showPassword ? 'text' : 'password'" 
+                            placeholder="Enter your password">
+                        <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
+                            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div *ngIf="(registerForm.get('password')?.touched || submitted) && registerForm.get('password')?.hasError('required')" class="error-message">
+                        Password is required.
+                    </div>
+                    <div *ngIf="(registerForm.get('password')?.touched || submitted) && registerForm.get('password')?.hasError('minlength')" class="error-message">
+                        Password must be at least 8 characters.
+                    </div>
+                </div>
+            </div>
+        </div>
+          
+        <div class="form-columns">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input 
+                        id="lastName" 
+                        formControlName="lastName" 
+                        type="text" 
+                        placeholder="Enter your last name">
+                    <div *ngIf="(registerForm.get('lastName')?.touched || submitted) && registerForm.get('lastName')?.hasError('required')" class="error-message">
+                        Last Name is required.
+                    </div>
+                </div>
+            </div>
+                
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="password-field">
+                        <input 
+                            id="confirmPassword" 
+                            formControlName="confirmPassword" 
+                            [type]="showConfirmPassword ? 'text' : 'password'" 
+                            placeholder="Confirm your password">
+                        <button type="button" class="password-toggle" (click)="toggleConfirmPasswordVisibility()">
+                            <svg *ngIf="!showConfirmPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg *ngIf="showConfirmPassword" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div *ngIf="(registerForm.get('confirmPassword')?.touched || submitted) && registerForm.get('confirmPassword')?.hasError('required')" class="error-message">
+                        Confirm Password is required.
+                    </div>
+                    <div *ngIf="(registerForm.get('confirmPassword')?.touched || submitted) && registerForm.hasError('passwordMismatch')" class="error-message">
+                        Passwords do not match.
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        <div class="form-columns">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input 
+                        id="username" 
+                        formControlName="username" 
+                        type="text" 
+                        placeholder="Choose a username">
+                    <div *ngIf="(registerForm.get('username')?.touched || submitted) && registerForm.get('username')?.hasError('required')" class="error-message">
+                        Username is required.
+                    </div>
+                </div>
+            </div>
+                
+            <div class="form-column">
+                <div class="specialist-toggle">
+                    <label class="switch-container">
+                        <input type="checkbox" formControlName="isSpecialist">
+                        <span class="switch-slider"></span>
+                        <span class="switch-label">Register as a Specialist</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+            
+        <div class="form-columns">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input 
+                        id="email" 
+                        formControlName="email" 
+                        type="email" 
+                        placeholder="Enter your email">
+                    <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.hasError('required')" class="error-message">
+                        Email is required.
+                    </div>
+                    <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.hasError('email')" class="error-message">
+                        Please enter a valid email.
+                    </div>
+                </div>
+            </div>
+                
+            <div class="form-column" *ngIf="registerForm.get('isSpecialist')?.value">
+                <div class="specialist-section">
+                    <h3>Professional Information</h3>
+                    <p class="specialist-notice">Your account will require admin approval before activation.</p>
+                </div>
+            </div>
+        </div>
+            
+        <div class="form-columns">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input 
+                        id="phoneNumber" 
+                        formControlName="phoneNumber" 
+                        type="text" 
+                        placeholder="Enter your phone number">
+                    <div *ngIf="(registerForm.get('phoneNumber')?.touched || submitted) && registerForm.get('phoneNumber')?.hasError('required')" class="error-message">
+                        Phone Number is required.
+                    </div>
+                </div>
+            </div>
+                
+            <div class="form-column" *ngIf="registerForm.get('isSpecialist')?.value">
+                <div class="form-group">
+                    <label for="licenseNumber">License Number</label>
+                    <input 
+                        id="licenseNumber" 
+                        formControlName="professionalLicenseNumber" 
+                        type="text" 
+                        placeholder="Enter your license number">
+                    <div *ngIf="(registerForm.get('professionalLicenseNumber')?.touched || submitted) && registerForm.get('professionalLicenseNumber')?.hasError('required')" class="error-message">
+                        License Number is required.
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        <div class="form-columns">
+            <div class="form-column">
+                <div class="form-group upload-group">
+                    <label for="pictureLink">Profile Picture</label>
+                    <div class="upload-area">
+                        <input 
+                            id="pictureLink" 
+                            formControlName="pictureLink" 
+                            type="file" 
+                            accept=".jpg,.jpeg,.png" 
+                            (change)="onFileChange($event, 'profile')">
+                        <div class="upload-placeholder" *ngIf="!profilePictureFile">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Upload profile picture</span>
+                        </div>
+                        <div class="file-selected" *ngIf="profilePictureFile">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span>{{ profilePictureFile.name }}</span>
+                        </div>
+                    </div>
+                    <div *ngIf="(registerForm.get('pictureLink')?.touched || submitted) && !profilePictureFile" class="error-message">
+                        Profile picture is required.
+                    </div>
+                </div>
+            </div>
+                
+            <div class="form-column" *ngIf="registerForm.get('isSpecialist')?.value">
+                <div class="form-group">
+                    <label for="yearsOfExperience">Years of Experience</label>
+                    <input 
+                        id="yearsOfExperience" 
+                        formControlName="yearsOfExperience" 
+                        type="number" 
+                        placeholder="Enter years of experience">
+                    <div *ngIf="(registerForm.get('yearsOfExperience')?.touched || submitted) && registerForm.get('yearsOfExperience')?.hasError('required')" class="error-message">
+                        Years of Experience is required.
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        <div class="form-columns" *ngIf="registerForm.get('isSpecialist')?.value">
+            <div class="form-column">
+                <div class="form-group">
+                    <label for="specialization">Specialization</label>
+                    <input 
+                        id="specialization" 
+                        formControlName="specialization" 
+                        type="text" 
+                        placeholder="Enter your specialization">
+                    <div *ngIf="(registerForm.get('specialization')?.touched || submitted) && registerForm.get('specialization')?.hasError('required')" class="error-message">
+                        Specialization is required.
+                    </div>
+                </div>
+            </div>
+                
+            <div class="form-column">
+                <div class="form-group upload-group">
+                    <label for="certificateFile">Certificate</label>
+                    <div class="upload-area">
+                        <input 
+                            id="certificateFile" 
+                            formControlName="certificateFile" 
+                            type="file" 
+                            accept=".pdf,.jpg,.jpeg,.png" 
+                            (change)="onFileChange($event, 'certificate')">
+                        <div class="upload-placeholder" *ngIf="!certificateFile">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Upload certificate</span>
+                        </div>
+                        <div class="file-selected" *ngIf="certificateFile">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                <span>{{ certificateFile.name }}</span>
+                            </div>
+                        </div>
+                        <div class="error-message" *ngIf="(registerForm.get('certificateFile')?.touched || submitted) && !certificateFile && registerForm.get('isSpecialist')?.value">
+                            Certificate file is required.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <div class="form-footer">
+            <button type="submit" [disabled]="registerForm.invalid || isLoading" class="register-button">
+                <span *ngIf="!isLoading">Create Account</span>
+                <div class="loader" *ngIf="isLoading"></div>
+            </button>
+            <p class="login-link">Already have an account? <a (click)="redirectToLogin()">Login here</a></p>
+        </div>
+    </form>
+    
+</div>
+<div class="house-decoration">
+    <div class="house house-1"></div>
+    <div class="house house-2"></div>
+    <div class="house house-3"></div>
+    <div class="house house-4"></div>
+    <div class="house house-5"></div>
+    <div class="house house-6"></div>
+</div>

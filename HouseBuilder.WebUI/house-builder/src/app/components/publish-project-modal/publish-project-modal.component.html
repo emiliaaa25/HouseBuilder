@@ -1,0 +1,178 @@
+<div *ngIf="isOpen" class="modal-overlay" (click)="onBackdropClick($event)">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2>Publish to Gallery</h2>
+      <button class="close-btn" (click)="closeModal()" [disabled]="isPublishing">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-content">
+      <div *ngIf="success" class="success-message">
+        <div class="success-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <h3>Project Published Successfully!</h3>
+        <p>Your project is now visible in the gallery and ready to inspire others.</p>
+      </div>
+
+      <div *ngIf="!success" class="publish-form">
+        <div class="form-group">
+          <label for="title">
+            Project Title 
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            id="title"
+            type="text"
+            [(ngModel)]="publishData.title"
+            placeholder="Enter a catchy title for your project"
+            maxlength="200"
+            class="form-input"
+            [disabled]="isPublishing"
+          />
+          <div class="char-count">{{ publishData.title?.length || 0 }}/200</div>
+        </div>
+        <div class="form-group">
+          <label for="authorName">
+            Your Name 
+            <span class="required-asterisk">*</span>
+          </label>
+          <input
+            id="authorName"
+            type="text"
+            [(ngModel)]="publishData.authorName"
+            placeholder="How should we credit you?"
+            maxlength="100"
+            class="form-input"
+            [disabled]="isPublishing"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            [(ngModel)]="publishData.description"
+            placeholder="Tell others about your design choices, inspiration, or special features..."
+            maxlength="1000"
+            rows="4"
+            class="form-textarea"
+            [disabled]="isPublishing"
+          ></textarea>
+          <div class="char-count">{{ publishData.description?.length || 0 }}/1000</div>
+        </div>
+
+        <div class="form-group">
+          <label>Project Thumbnail</label>
+          
+          <div class="thumbnail-section">
+            <div *ngIf="thumbnailPreview" class="thumbnail-preview">
+              <img [src]="thumbnailPreview" alt="Project thumbnail" />
+              <button 
+                type="button" 
+                class="remove-thumbnail-btn" 
+                (click)="removeThumbnail()"
+                [disabled]="isPublishing"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            <div class="thumbnail-actions">
+              <button
+                type="button"
+                class="thumbnail-btn primary"
+                (click)="generateThumbnail()"
+                [disabled]="isPublishing || generatingThumbnail"
+              >
+                <svg *ngIf="!generatingThumbnail" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                <div *ngIf="generatingThumbnail" class="spinner"></div>
+                {{ generatingThumbnail ? 'Generating...' : 'Generate from 3D View' }}
+              </button>
+
+              <div class="or-divider">or</div>
+
+              <label class="thumbnail-btn upload-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Upload Image
+                <input
+                  type="file"
+                  accept="image/*"
+                  (change)="onFileSelected($event)"
+                  [disabled]="isPublishing"
+                />
+              </label>
+            </div>
+
+            <p class="help-text">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              A compelling thumbnail helps your project stand out in the gallery. Max file size: 5MB. Recommended size: 800x600px.
+            </p>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="error" class="error-message">
+          <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+          {{ error }}
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!success" class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="closeModal()"
+        [disabled]="isPublishing"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        Cancel
+      </button>
+      
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="publish()"
+        [disabled]="isPublishing || !publishData.title?.trim() || !publishData.authorName?.trim()"
+      >
+        <div *ngIf="isPublishing" class="spinner"></div>
+        <svg *ngIf="!isPublishing" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        {{ isPublishing ? 'Publishing...' : 'Publish Project' }}
+      </button>
+    </div>
+  </div>
+</div>

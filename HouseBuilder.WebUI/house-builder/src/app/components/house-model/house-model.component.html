@@ -1,0 +1,360 @@
+<app-navbar></app-navbar>
+
+<div class="house-3d-view">
+  
+  <div class="main-content">
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+    <div class="model-container">
+      <div class="renderer-wrapper">
+        <div class="renderer-container" 
+             #rendererContainer
+             [class.drag-over]="dragDebug.isDragging">
+          <div *ngIf="dragDebug.isDragging" class="drop-zone-overlays">
+            <div class="drop-zone front">Front Wall</div>
+            <div class="drop-zone back">Back Wall</div>
+            <div class="drop-zone left">Left Wall</div>
+            <div class="drop-zone right">Right Wall</div>
+          </div>
+          <div *ngIf="loading" class="loading-overlay">
+            <div class="spinner-border" role="status"></div>
+            <div class="loading-text">Loading 3D model...</div>
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-success" (click)="openMaterialsCalculator()">
+            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            Materials Calculator
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="side-menu">
+      <div *ngIf="showConfigModal" class="element-config-overlay" (click)="closeConfigModal($event)">
+        <div class="element-config-modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3 class="modal-title">
+              <svg class="modal-title-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4V12m0 2a2 2 0 110 4m-6-8a2 2 0 100-4m0 4a2 2 0 100 4m0-4V4m0 2a2 2 0 100 4" />
+              </svg>
+              {{ configModalData.isEditing ? 'Edit' : 'Configure' }} 
+              {{ configModalData.type === 'door' ? 'Door' : 'Window' }}
+            </h3>
+            <button class="close-btn" (click)="closeConfigModal($event)">✕</button>
+          </div>
+          
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">
+                <svg class="form-label-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                Wall
+              </label>
+              <select class="form-control" [(ngModel)]="configModalData.wall" (change)="onModalWallChange()">
+                <option *ngFor="let wall of getAvailableWalls()" [value]="wall.value">
+                  {{ wall.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <svg class="form-label-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Horizontal Position
+              </label>
+              <div class="range-container">
+                <input type="range" 
+                       class="range-input" 
+                       min="0" 
+                       max="1" 
+                       step="0.01" 
+                       [(ngModel)]="configModalData.position"
+                       (input)="onModalPositionChange()">
+                <span class="range-value">{{ (configModalData.position * 100).toFixed(0) }}%</span>
+              </div>
+            </div>
+            
+            <div *ngIf="configModalData.type === 'window'" class="form-group">
+              <label class="form-label">
+                <svg class="form-label-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+                Vertical Position
+              </label>
+              <div class="range-container">
+                <input type="range" 
+                       class="range-input" 
+                       min="0" 
+                       max="5" 
+                       step="0.01" 
+                       [(ngModel)]="configModalData.position2"
+                       (input)="onModalPositionChange()">
+                <span class="range-value">{{ (configModalData.position2 * 100).toFixed(0) }}%</span>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">
+                <svg class="form-label-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+                Dimensions
+              </label>
+              
+              <div class="form-group">
+                <label class="form-label">Width (X)</label>
+                <div class="range-container">
+                  <input type="range" 
+                         class="range-input" 
+                         [min]="scaleLimits.min" 
+                         [max]="scaleLimits.max" 
+                         step="0.05" 
+                         [(ngModel)]="configModalData.scale.x"
+                         (input)="onModalScaleChange()">
+                  <span class="range-value">{{ configModalData.scale.x.toFixed(2) }}</span>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Height (Y)</label>
+                <div class="range-container">
+                  <input type="range" 
+                         class="range-input" 
+                         [min]="scaleLimits.min" 
+                         [max]="scaleLimits.max" 
+                         step="0.05" 
+                         [(ngModel)]="configModalData.scale.y"
+                         (input)="onModalScaleChange()">
+                  <span class="range-value">{{ configModalData.scale.y.toFixed(2) }}</span>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Depth (Z)</label>
+                <div class="range-container">
+                  <input type="range" 
+                         class="range-input" 
+                         [min]="scaleLimits.min" 
+                         [max]="scaleLimits.max" 
+                         step="0.05" 
+                         [(ngModel)]="configModalData.scale.z"
+                         (input)="onModalScaleChange()">
+                  <span class="range-value">{{ configModalData.scale.z.toFixed(2) }}</span>
+                </div>
+              </div>
+              
+              <button class="btn btn-secondary" (click)="resetModalScale()">
+                <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Reset Dimensions
+              </button>
+            </div>
+          </div>
+          
+          <div class="modal-actions">
+            <button *ngIf="configModalData.isEditing" 
+                    class="btn btn-danger" 
+                    (click)="deleteElementFromModal()">
+              <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete
+            </button>
+            
+            <button class="btn btn-primary" (click)="applyElementConfig()">
+              <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              {{ configModalData.isEditing ? 'Apply' : 'Add' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="elements-panel">
+        <h3>Available Elements</h3>
+        <div class="elements-tabs">
+          <button class="tab-button" 
+                  [class.active]="activeTab === 'doors'" 
+                  (click)="setActiveTab('doors')">
+            <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13v-1m4 1v-3m4 3V8M8 21l4-7 4 7M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+            </svg>
+            Doors
+          </button>
+          <button class="tab-button" 
+                  [class.active]="activeTab === 'windows'" 
+                  (click)="setActiveTab('windows')">
+            <svg class="tab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5v14m8-14v14" />
+            </svg>
+            Windows
+          </button>
+        </div>
+        <div class="element-grid-container">
+          <div *ngIf="activeTab === 'doors'">
+            <div class="element-list">
+              <div *ngIf="getCurrentPageItems('doors').length === 0" class="no-elements-message">
+                No doors available on this page.
+              </div>
+              
+              <div *ngFor="let door of getCurrentPageItems('doors')" 
+                   class="element-item" 
+                   draggable="true"
+                   (dragstart)="onDragStart($event, 'door', door)"
+                   (click)="openElementConfigModal('door', door)">
+                <img [src]="door.thumbnail" [alt]="door.id || ''" 
+                     onerror="this.src='assets/placeholder-door.png'">
+                <span>{{ door.id }}</span>
+              </div>
+            </div>
+            <div class="pagination-container" *ngIf="availableDoors.length > itemsPerPage">
+              <button class="pagination-btn" 
+                      (click)="previousPage('doors')" 
+                      [disabled]="pagination.doors.currentPage === 1">
+                Previous
+              </button>
+              <span class="pagination-info">
+                Page {{ pagination.doors.currentPage }} of {{ getTotalPages('doors') }}
+              </span>
+              <button class="pagination-btn" 
+                      (click)="nextPage('doors')" 
+                      [disabled]="pagination.doors.currentPage === getTotalPages('doors')">
+                Next
+              </button>
+            </div>
+          </div>
+          
+          <div *ngIf="activeTab === 'windows'">
+            <div class="element-list">
+              <div *ngIf="getCurrentPageItems('windows').length === 0" class="no-elements-message">
+                No windows available on this page.
+              </div>
+              <div *ngFor="let window of getCurrentPageItems('windows')" 
+                   class="element-item" 
+                   draggable="true"
+                   (dragstart)="onDragStart($event, 'window', window)"
+                   (click)="openElementConfigModal('window', window)">
+                <img [src]="window.thumbnail" [alt]="window.id || ''" 
+                     onerror="this.src='assets/placeholder-window.png'">
+                <span>{{ window.id }}</span>
+              </div>
+            </div>
+            <div class="pagination-container" *ngIf="availableWindows.length > itemsPerPage">
+              <button class="pagination-btn" 
+                      (click)="previousPage('windows')" 
+                      [disabled]="pagination.windows.currentPage === 1">
+                Previous
+              </button>
+              <span class="pagination-info">
+                Page {{ pagination.windows.currentPage }} of {{ getTotalPages('windows') }}
+              </span>
+              <button class="pagination-btn" 
+                      (click)="nextPage('windows')" 
+                      [disabled]="pagination.windows.currentPage === getTotalPages('windows')">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <div class="instructions">
+        <p><strong>How to use:</strong></p>
+        <p>• Click on an element for advanced configuration</p>
+        <p>• Drag and drop elements onto the 3D house</p>
+        <p>• Click on placed elements in the scene to edit them</p>
+        <p>• Changes are saved automatically when you add or apply objects</p>
+      </div>
+
+      <div *ngIf="false && selectedElement" class="element-editor" style="display: none;">
+        <h3>Edit {{ selectedElement.type === 'door' ? 'Door' : 'Window' }}</h3>
+        
+        <div class="editor-field">
+          <label>Wall</label>
+          <select [(ngModel)]="selectedElement.wall" (change)="updateElementPosition()">
+            <option *ngFor="let wall of getAvailableWalls()" 
+                    [value]="wall.value">{{ wall.name }}</option>
+          </select>
+        </div>
+        
+        <div *ngIf="selectedElement.type === 'door'" class="editor-field">
+          <label>Position</label>
+          <input type="range" min="0" max="1" step="0.01" 
+                 [(ngModel)]="selectedElement.position" 
+                 (input)="updateElementPosition()">
+          <span class="position-value">{{ (selectedElement.position * 100).toFixed(0) }}%</span>
+        </div>
+        
+        <div *ngIf="selectedElement.type === 'window'">
+          <div class="editor-field">
+            <label>Horizontal Position</label>
+            <input type="range" min="0" max="1" step="0.01" 
+                   [(ngModel)]="selectedElement.position" 
+                   (input)="selectedElement.position = selectedElement.position!; updateElementPosition()">
+            <span class="position-value">{{ ((selectedElement.position || 0) * 100).toFixed(0) }}%</span>
+          </div>
+          
+          <div class="editor-field">
+            <label>Vertical Position</label>
+            <input type="range" min="0" max="15" step="0.01" 
+                   [(ngModel)]="selectedElement.position2" 
+                   (input)="updateElementPosition()">
+            <span class="position-value">{{ ((selectedElement.position2 || 0) * 100).toFixed(0) }}%</span>
+          </div>
+        </div>
+        
+        <ng-container *ngIf="initializeScaleIfNeeded()">
+          <div class="scale-controls">
+            <h4>Element Dimensions</h4>
+            
+            <div class="scale-field">
+              <label>Width (X)</label>
+              <input type="range" [min]="scaleLimits.min" [max]="scaleLimits.max" step="0.05" 
+                  [(ngModel)]="selectedElement.scale!.x" 
+                  (input)="updateElementScale()">
+              <span class="scale-value">{{ selectedElement.scale!.x.toFixed(2) }}</span>
+            </div>
+            
+            <div class="scale-field">
+              <label>Height (Y)</label>
+              <input type="range" [min]="scaleLimits.min" [max]="scaleLimits.max" step="0.05" 
+                  [(ngModel)]="selectedElement.scale!.y" 
+                  (input)="updateElementScale()">
+              <span class="scale-value">{{ selectedElement.scale!.y.toFixed(2) }}</span>
+            </div>
+            
+            <div class="scale-field">
+              <label>Depth (Z)</label>
+              <input type="range" [min]="scaleLimits.min" [max]="scaleLimits.max" step="0.05" 
+                  [(ngModel)]="selectedElement.scale!.z" 
+                  (input)="updateElementScale()">
+              <span class="scale-value">{{ selectedElement.scale!.z.toFixed(2) }}</span>
+            </div>
+            
+            <button class="btn btn-sm btn-outline-secondary" (click)="resetElementScale()">
+              Reset Dimensions
+            </button>
+          </div>
+        </ng-container>
+        
+        <div class="editor-actions">
+          <button class="btn btn-danger" (click)="removeElement()">Delete</button>
+          <button class="btn btn-primary" (click)="saveChanges()">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+   <app-materials-calculator 
+  *ngIf="showMaterialsModal"
+  [houseSpecs]="houseSpecs!"
+  (closeModal)="closeMaterialsCalculator()">
+</app-materials-calculator>
+</div>

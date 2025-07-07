@@ -1,0 +1,107 @@
+<app-navbar></app-navbar>
+
+<div class="gallery-container">
+  <div class="gallery-header">
+    <h1>Project Gallery</h1>
+    <p>Discover amazing house designs from our community</p>
+    
+    <div class="filters">
+      <select [(ngModel)]="filters.sortBy" (change)="onSortChange()" class="sort-select">
+        <option *ngFor="let option of sortOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading projects...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+    <button (click)="loadProjects()" class="retry-btn">Retry</button>
+  </div>
+
+  <div *ngIf="!loading && projects.length > 0" class="projects-grid">
+    <div *ngFor="let project of projects" class="project-card">
+      <div class="project-thumbnail" (click)="viewProject(project)">
+        <img 
+          *ngIf="project.thumbnail" 
+          [src]="project.thumbnail" 
+          [alt]="project.title || 'Project thumbnail'"
+          class="thumbnail-image"
+        />
+        <div *ngIf="!project.thumbnail" class="no-thumbnail">
+          <i class="fas fa-home"></i>
+        </div>
+        
+        <div class="thumbnail-overlay">
+          <button (click)="viewProject(project); $event.stopPropagation()" class="view-3d-btn">
+            <i class="fas fa-cube"></i>
+            View 3D
+          </button>
+        </div>
+      </div>
+
+      <div class="project-info">
+        <h3 class="project-title">{{ project.title || 'Untitled Project' }}</h3>
+        <p class="project-author">by {{ project.authorName || 'Anonymous' }}</p>
+        
+        <p *ngIf="project.description" class="project-description">
+          {{ project.description }}
+        </p>
+
+        <div class="project-actions">
+          <div class="project-stats">
+            <span class="stat">
+              <i class="fas fa-eye"></i>
+              {{ formatNumber(project.views) }}
+            </span>
+            <span class="stat">
+              <i class="fas fa-heart" [class.liked]="project.isLikedByCurrentUser"></i>
+              {{ formatNumber(project.likes) }}
+            </span>
+          </div>
+
+          <div class="action-buttons">
+            <button 
+              (click)="toggleLike(project)" 
+              class="like-btn"
+              [class.liked]="project.isLikedByCurrentUser"
+              [disabled]="!currentUserId"
+            >
+              <i class="fas fa-heart"></i>
+              {{ project.isLikedByCurrentUser ? 'Unlike' : 'Like' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="project-meta">
+          <span class="publish-date">{{ formatDate(project.publishedAt) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="hasMore && projects.length > 0" class="load-more-container">
+    <button 
+      (click)="loadMore()" 
+      class="load-more-btn"
+      [disabled]="loadingMore"
+    >
+      <span *ngIf="!loadingMore">Load More</span>
+      <span *ngIf="loadingMore">
+        <i class="fas fa-spinner fa-spin"></i>
+        Loading...
+      </span>
+    </button>
+  </div>
+
+  <div *ngIf="!loading && projects.length === 0" class="empty-state">
+    <i class="fas fa-images"></i>
+    <h2>No Projects Found</h2>
+    <p>Be the first to share your amazing house design!</p>
+  </div>
+</div>

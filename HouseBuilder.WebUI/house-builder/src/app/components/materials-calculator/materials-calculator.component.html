@@ -1,0 +1,195 @@
+<div class="materials-overlay" (click)="onOverlayClick($event)">
+      <div class="materials-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>
+            <svg class="header-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            Required Construction Materials
+          </h2>
+          <button class="close-btn" (click)="close()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="project-summary">
+            <h3>Project Overview</h3>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <span class="label">Shape:</span>
+                <span class="value">{{ getShapeTypeName() }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Total Area:</span>
+                <span class="value">{{ totalFloorArea.toFixed(2) }} m²</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Floors:</span>
+                <span class="value">{{ houseSpecs.numFloors || 1 }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Total Height:</span>
+                <span class="value">{{ getTotalHeight().toFixed(2) }} m</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Roof Type:</span>
+                <span class="value">{{ getRoofTypeName() }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="label">Wall Perimeter:</span>
+                <span class="value">{{ wallPerimeter.toFixed(2) }} m</span>
+              </div>
+            </div>
+          </div>
+          <div class="materials-categories">
+            <div class="category-section">
+              <div class="category-header" (click)="toggleCategory('structural')">
+                <svg class="category-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <h4>Structural Materials</h4>
+                <span class="category-total">€{{ getCategoryTotal('structural').toFixed(2) }}</span>
+                <svg class="expand-icon" [class.expanded]="expandedCategories.structural" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <div class="materials-list" [class.expanded]="expandedCategories.structural">
+                <div *ngFor="let material of materialSummary.structural" class="material-item">
+                  <div class="material-info">
+                    <span class="material-name">{{ material.name }}</span>
+                    <span class="material-notes" *ngIf="material.notes">{{ material.notes }}</span>
+                  </div>
+                  <div class="material-quantity">
+                    <span class="quantity">{{ material.quantity.toFixed(2) }} {{ material.unit }}</span>
+                    <span class="cost" *ngIf="material.estimatedCost">€{{ material.estimatedCost.toFixed(2) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="category-section">
+              <div class="category-header" (click)="toggleCategory('roofing')">
+                <svg class="category-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <h4>Roofing Materials</h4>
+                <span class="category-total">€{{ getCategoryTotal('roofing').toFixed(2) }}</span>
+                <svg class="expand-icon" [class.expanded]="expandedCategories.roofing" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <div class="materials-list" [class.expanded]="expandedCategories.roofing">
+                <div *ngFor="let material of materialSummary.roofing" class="material-item">
+                  <div class="material-info">
+                    <span class="material-name">{{ material.name }}</span>
+                    <span class="material-notes" *ngIf="material.notes">{{ material.notes }}</span>
+                  </div>
+                  <div class="material-quantity">
+                    <span class="quantity">{{ material.quantity.toFixed(2) }} {{ material.unit }}</span>
+                    <span class="cost" *ngIf="material.estimatedCost">€{{ material.estimatedCost.toFixed(2) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="category-section">
+              <div class="category-header" (click)="toggleCategory('flooring')">
+                <svg class="category-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                </svg>
+                <h4>Flooring Materials</h4>
+                <span class="category-total">€{{ getCategoryTotal('flooring').toFixed(2) }}</span>
+                <svg class="expand-icon" [class.expanded]="expandedCategories.flooring" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <div class="materials-list" [class.expanded]="expandedCategories.flooring">
+                <div *ngFor="let material of materialSummary.flooring" class="material-item">
+                  <div class="material-info">
+                    <span class="material-name">{{ material.name }}</span>
+                    <span class="material-notes" *ngIf="material.notes">{{ material.notes }}</span>
+                  </div>
+                  <div class="material-quantity">
+                    <span class="quantity">{{ material.quantity.toFixed(2) }} {{ material.unit }}</span>
+                    <span class="cost" *ngIf="material.estimatedCost">€{{ material.estimatedCost.toFixed(2) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="category-section">
+              <div class="category-header" (click)="toggleCategory('finishing')">
+                <svg class="category-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v1m0 0h10a2 2 0 012 2v11a4 4 0 01-4 4H9a2 2 0 01-2-2v-5" />
+                </svg>
+                <h4>Finishing Materials</h4>
+                <span class="category-total">€{{ getCategoryTotal('finishing').toFixed(2) }}</span>
+                <svg class="expand-icon" [class.expanded]="expandedCategories.finishing" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <div class="materials-list" [class.expanded]="expandedCategories.finishing">
+                <div *ngFor="let material of materialSummary.finishing" class="material-item">
+                  <div class="material-info">
+                    <span class="material-name">{{ material.name }}</span>
+                    <span class="material-notes" *ngIf="material.notes">{{ material.notes }}</span>
+                  </div>
+                  <div class="material-quantity">
+                    <span class="quantity">{{ material.quantity.toFixed(2) }} {{ material.unit }}</span>
+                    <span class="cost" *ngIf="material.estimatedCost">€{{ material.estimatedCost.toFixed(2) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cost-summary">
+            <div class="cost-breakdown">
+              <div class="cost-item">
+                <span>Structural:</span>
+                <span>€{{ getCategoryTotal('structural').toFixed(2) }}</span>
+              </div>
+              <div class="cost-item">
+                <span>Roofing:</span>
+                <span>€{{ getCategoryTotal('roofing').toFixed(2) }}</span>
+              </div>
+              <div class="cost-item">
+                <span>Flooring:</span>
+                <span>€{{ getCategoryTotal('flooring').toFixed(2) }}</span>
+              </div>
+              <div class="cost-item">
+                <span>Finishing:</span>
+                <span>€{{ getCategoryTotal('finishing').toFixed(2) }}</span>
+              </div>
+            </div>
+            <div class="total-cost">
+              <strong>Total Estimated Cost: €{{ materialSummary.totalEstimatedCost.toFixed(2) }}</strong>
+            </div>
+          </div>
+
+          <div class="disclaimer">
+            <p><strong>Note:</strong> These are estimated quantities and costs based on standard construction practices. 
+            Actual requirements may vary based on local building codes, site conditions, and construction methods. 
+            It's recommended to consult with local suppliers and contractors for accurate pricing and quantities.</p>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="exportToCSV()">
+            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Export to CSV
+          </button>
+          <button class="btn btn-primary" (click)="close()">
+            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>

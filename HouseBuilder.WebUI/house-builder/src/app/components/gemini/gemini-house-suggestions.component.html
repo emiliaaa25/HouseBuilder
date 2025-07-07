@@ -1,0 +1,116 @@
+<app-navbar></app-navbar>
+<div class="gemini-suggestions-container">
+  <div class="main-content">
+    <div class="ai-card">
+      <div class="card-header">
+        <h1 class="card-title">AI-Powered House Design</h1>
+        <p class="card-subtitle">Fill out the specific details to get targeted architectural suggestions for your dream home</p>
+      </div>
+
+      <form 
+        [formGroup]="structuredForm" 
+        (ngSubmit)="submitPrompt()"
+        class="form-container"
+      >
+        <div class="input-row">
+          <div class="input-group">
+            <label for="landSize" class="input-label">Land Size (ares)</label>
+            <input 
+              type="number" 
+              id="landSize" 
+              formControlName="landSize" 
+              class="input-field"
+              min="1"
+              placeholder="10"
+            >
+            <div class="error-text" *ngIf="structuredForm.get('landSize')?.invalid && structuredForm.get('landSize')?.touched">
+              Please enter a valid land size
+            </div>
+          </div>
+          
+          <div class="input-group">
+            <label for="houseShape" class="input-label">House Shape</label>
+            <select id="houseShape" formControlName="houseShape" class="input-field">
+              <option *ngFor="let option of houseShapeOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="input-row">
+          <div class="input-group">
+            <label for="budget" class="input-label">Budget (Optional)</label>
+            <input 
+              type="text" 
+              id="budget" 
+              formControlName="budget" 
+              class="input-field"
+              placeholder="e.g., €150,000"
+            >
+          </div>
+          
+          <div class="input-group">
+            <label for="familySize" class="input-label">Family Size (Optional)</label>
+            <input 
+              type="text" 
+              id="familySize" 
+              formControlName="familySize" 
+              class="input-field"
+              placeholder="e.g., 4 people"
+            >
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label for="additionalRequirements" class="input-label">Special Requirements (Optional)</label>
+          <textarea 
+            id="additionalRequirements" 
+            formControlName="additionalRequirements" 
+            class="input-field textarea-field"
+            placeholder="e.g., Home office, garage for 2 cars, large kitchen, swimming pool..."
+          ></textarea>
+        </div>
+        
+        <div class="button-group">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="structuredForm.invalid || isLoading"
+          >
+            <svg *ngIf="isLoading" class="loading-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+            </svg>
+            {{ isLoading ? 'Generating Your Design...' : 'Generate House Design' }}
+          </button>
+          
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            *ngIf="geminiResponse"
+            (click)="clearResponse()"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+            </svg>
+            Clear Results
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="error-banner" *ngIf="errorMessage">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <div class="response-card" *ngIf="geminiResponse">
+      <div class="response-header">
+        <h3 class="response-title">Your Personalized House Design Suggestions</h3>
+      </div>
+      
+      <div class="response-content">
+        <div [innerHTML]="geminiResponse | formatResponse"></div>
+      </div>
+    </div>
+  </div>
+</div>
