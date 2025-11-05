@@ -1,0 +1,7 @@
+O aplicație web interactiva menita să modernizeze procesul de proiectare în domeniul construcțiilor rezidențiale, prin generarea automată de modele 3D pe baza specificațiilor introduse de utilizator. Proiectul răspunde nevoii actuale de digitalizare în construcții, oferind o soluție care îmbină ușurința de utilizare cu tehnologii moderne pentru vizualizarea realistă a locuințelor înainte de execuție.
+
+  Utilizatorul poate defini parametrii de bază ai unei construcții (dimensiuni, formă, materiale), iar sistemul generează automat un model tridimensional. Aceste modele 3D interactive pot fi personalizate în timp real și sunt prezentate prin randări realiste, contribuind la o mai bună înțelegere vizuală a viitorului proiect.
+
+  Aplicația include și un modul de estimare automată a costurilor, bazat pe materiale prestabilite și dimensiunile modelului, dar și un sistem de recomandări inteligente pentru design, folosind tehnici de inteligență artificială. Utilizatorii pot explora o galerie publică cu proiecte realizate de alți utilizatori, pot aprecia sau publica propriile modele, oferind astfel o direcție colaborativă platformei.
+
+  Proiectul este implementat folosind o arhitectură modernă: Angular pentru frontend, ASP .NET Core pentru backend, Three.js pentru modelarea 3D, și PostgreSQL pentru gestionarea datelor. Lucrarea evidențiază modul în care tehnologia poate transforma procesul de proiectare în construcții, facilitând decizii rapide, costuri estimate corect și o experiență vizuală realistă și accesibilă pentru orice utilizator.
